@@ -1,10 +1,21 @@
 //TODO docstringz yo
 
-pub const TAPE_SIZE: usize = 30_000;  //consider making it unlimited to the right
+pub const TAPE_SIZE: usize = 30_000;  //TODO consider making it unlimited to the right
 
 type Steps = Vec<Op>; //TODO prefer stack allocation if possible?  Vectors are convenient but heap
 
-//TODO think about extending unlimited on the right for Turing-completeness
+#[derive(Debug, PartialEq)]
+pub enum Op {
+    Inc,
+    Dec,
+    MoveUp,
+    MoveDown,
+    Out,
+    In,
+    Open,
+    Close,
+}
+
 struct Machine {
     tape: [u8; TAPE_SIZE],
     pos: usize, //TODO use ptr to active cell instead of index
@@ -51,18 +62,14 @@ impl Machine {
             panic!("no more room on right of tape");
         }
     }
-}
 
-#[derive(Debug, PartialEq)]
-pub enum Op {
-    Inc,
-    Dec,
-    MoveUp,
-    MoveDown,
-    Out,
-    In,
-    Open,
-    Close,
+    fn move_down(&mut self) {
+        if self.pos > 0 {
+            self.pos -= 1;
+        } else {
+            panic!("no more room on left of tape");
+        }
+    }
 }
 
 fn parse(input: &str) -> Steps {
@@ -175,6 +182,21 @@ mod tests {
         let mut test_machine = Machine::new(None);
         test_machine.pos = TAPE_SIZE - 1;
         test_machine.move_up();
+    }
+    #[test]
+    fn test_move_down() {
+        use Machine;
+        let mut test_machine = Machine::new(None);
+        test_machine.pos = 2;
+        test_machine.move_down();
+        assert_eq!(test_machine.pos, 1);
+    }
+    #[test]
+    #[should_panic(expected = "no more room on left of tape")]
+    fn test_move_down_panic() {
+        use Machine;
+        let mut test_machine = Machine::new(None);
+        test_machine.move_down();
     }
     //fn test_hello_world() {
     //   use run;
