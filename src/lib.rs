@@ -125,6 +125,12 @@ mod tests {
                    [Inc, Dec, MoveUp, MoveDown, Out, In, Open, Close]);
     }
     #[test]
+    #[should_panic(expected = "Unrecognized char: x")]
+    fn test_parse_illegal() {
+        use parse;
+        parse("+-><.,[]x");
+    }
+    #[test]
     fn test_increment() {
         use Machine;
         let mut test_machine = Machine::new(None);
