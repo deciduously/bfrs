@@ -32,7 +32,7 @@ impl Machine {
         if self.tape[self.pos] < 255 {
             self.tape[self.pos] += 1;
         } else {
-            panic!("Cell overflow at {}", self.pos); //TODO should it wrap?
+            panic!("Cell overflow at {}, could not increment", self.pos); //TODO should it wrap?
         }
     }
 
@@ -40,7 +40,7 @@ impl Machine {
         if self.tape[self.pos] > 0 {
             self.tape[self.pos] -= 1;
         } else {
-            panic!("Cell overflow at {}", self.pos);
+            panic!("Cell overflow at {}, could not decrement", self.pos);
         }
     }
 
@@ -138,12 +138,27 @@ mod tests {
         assert_eq!(test_machine.tape[test_machine.pos], 1);
     }
     #[test]
+    #[should_panic(expected = "Cell overflow at 0, could not increment")]
+    fn test_increment_overflow() {
+        use Machine;
+        let mut test_machine = Machine::new(None);
+        test_machine.tape[test_machine.pos] = 255;
+        test_machine.increment();
+    }
+    #[test]
     fn test_decrement() {
         use Machine;
         let mut test_machine = Machine::new(None);
         test_machine.tape[test_machine.pos] = 1;
         test_machine.decrement();
         assert_eq!(test_machine.tape[test_machine.pos], 0);
+    }
+    #[test]
+    #[should_panic(expected = "Cell overflow at 0, could not decrement")]
+    fn test_decrement_overflow() {
+        use Machine;
+        let mut test_machine = Machine::new(None);
+        test_machine.decrement();
     }
     #[test]
     fn test_move_up() {
