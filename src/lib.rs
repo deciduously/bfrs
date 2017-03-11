@@ -70,6 +70,15 @@ impl Machine {
             panic!("no more room on left of tape");
         }
     }
+
+    fn out(&mut self) -> char {
+        use std::ascii::AsciiExt;
+        if self.tape[self.pos].is_ascii() {
+        self.tape[self.pos] as char
+        } else {
+            panic!("char at {} not ascii", self.pos);
+        }
+    }
 }
 
 fn parse(input: &str) -> Steps {
@@ -80,11 +89,12 @@ fn parse(input: &str) -> Steps {
     ret
 }
 
-//pub fn run(input: &str) {
-//    let steps = parse(input);
-//    let machine = Machine::new(steps);
-//    machine::execute();
-//}
+pub fn run(input: &str) -> &str {
+   //let steps = parse(input);
+    //let machine = Machine::new(steps);
+    //machine.execute();
+    "Not Yet"
+}
 
 pub fn translate(symbol: char) -> Op {
     use Op::*;
@@ -198,11 +208,35 @@ mod tests {
         let mut test_machine = Machine::new(None);
         test_machine.move_down();
     }
-    //fn test_hello_world() {
-    //   use run;
-    //   assert_eq!(run(
-    //    "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
-    //    ),
-    //             "Hello, World!");
-    //}
+    #[test]
+    fn test_out() {
+        use Machine;
+        let mut test_machine = Machine::new(None);
+        test_machine.tape[test_machine.pos] = 65;
+        assert_eq!(test_machine.out(), 'A');
+        test_machine.tape[test_machine.pos] = 97;
+        assert_eq!(test_machine.out(), 'a');
+        test_machine.tape[test_machine.pos] = 9;
+        assert_eq!(test_machine.out(), '\t');
+        test_machine.tape[test_machine.pos] = 0;
+        assert_eq!(test_machine.out(), '\0');
+        test_machine.tape[test_machine.pos] = 2;
+        assert_eq!(test_machine.out(), 2u8 as char);
+    }
+    #[test]
+    #[should_panic(expected = "char at 0 not ascii")]
+    fn test_out_not_ascii() {
+        use Machine;
+        let mut test_machine = Machine::new(None);
+        test_machine.tape[test_machine.pos] = 128;
+        test_machine.out();
+    }
+    #[test]
+    fn test_hello_world() {
+       use run;
+       assert_eq!(run(
+        "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
+        ),
+                 "Hello, World!");
+    }
 }
