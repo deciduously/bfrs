@@ -2,7 +2,7 @@
 
 pub const TAPE_SIZE: usize = 30_000; //TODO consider making it unlimited to the right
 
-type Steps = Vec<Op>; //TODO prefer stack allocation if possible?  Vectors are convenient but heap
+type Steps = Vec<Op>;
 
 #[derive(Debug, PartialEq)]
 pub enum Op {
@@ -11,16 +11,18 @@ pub enum Op {
     MoveUp,
     MoveDown,
     Out,
-    In,
+    //In, --NOT REQUIRED FOR GETTING HELLO_WORLD TO PASS
     Open,
     Close,
 }
 
 struct Machine {
     tape: [u8; TAPE_SIZE],
-    index: usize, //this feels like a clunky way to do this
+    index: usize, //TODO Storing the index and generating a new Box each move feels clunky
     active: Box<u8>,
     steps: Steps,
+    loop_open: Option<usize>, //this also seems clunky
+    loop_close: Option<usize>,
 }
 
 impl Machine {
@@ -34,6 +36,8 @@ impl Machine {
             index: index,
             active: Box::new(tape[index]),
             steps: steps.unwrap_or(Vec::new()),
+            loop_open: None,
+            loop_close: None,
         }
     }
     //execute for Machine runs all steps in order
@@ -75,12 +79,34 @@ impl Machine {
         }
     }
 
-    fn out(&mut self) -> char {
+    fn out(&self) -> char {
         use std::ascii::AsciiExt;
         if self.active.is_ascii() {
             *self.active as char
         } else {
             panic!("char at {} not ascii", self.index);
+        }
+    }
+
+    fn open(&mut self) {
+        self.loop_open = Some(self.index);
+        if *self.active == 0 {
+            self.index = self.loop_close.unwrap() + 1;
+            self.active = Box::new(self.tape[self.index]);
+        } else {
+            self.index += 1;
+            self.active = Box::new(self.tape[self.index]);
+        }
+    }
+
+    fn close(&mut self) {
+        self.loop_close = Some(self.index);
+        if *self.active != 0 {
+            self.index = self.loop_open.unwrap() + 1;
+            self.active = Box::new(self.tape[self.index]);
+        } else {
+            self.index += 1;
+            self.active = Box::new(self.tape[self.index]);
         }
     }
 }
@@ -109,7 +135,7 @@ pub fn translate(symbol: char) -> Op {
         '>' => MoveUp,
         '<' => MoveDown,
         '.' => Out,
-        ',' => In,
+        //',' => In, --NOT REQUIRED FOR HELLO_WORLD
         '[' => Open,
         ']' => Close,
         _ => panic!("Unrecognized char: {}", symbol),
@@ -127,7 +153,7 @@ mod tests {
         assert_eq!(translate('<'), MoveDown);
         assert_eq!(translate('>'), MoveUp);
         assert_eq!(translate('.'), Out);
-        assert_eq!(translate(','), In);
+        //assert_eq!(translate(','), In);  --NOT REQUIRED FOR HELLO_WORLD
         assert_eq!(translate('['), Open);
         assert_eq!(translate(']'), Close);
     }
@@ -142,14 +168,14 @@ mod tests {
         use parse;
         use Op::*;
 
-        assert_eq!(parse("+-><.,[]"),
-                   [Inc, Dec, MoveUp, MoveDown, Out, In, Open, Close]);
+        assert_eq!(parse("+-><.[]"), //REMEMBER TO ADD OP::IN 
+                   [Inc, Dec, MoveUp, MoveDown, Out, Open, Close]);
     }
     #[test]
     #[should_panic(expected = "Unrecognized char: x")]
     fn test_parse_illegal() {
         use parse;
-        parse("+-><.,[]x");
+        parse("+-><.[]x"); //REMEMBER TO ADD OP::IN
     }
     #[test]
     fn test_increment() {
