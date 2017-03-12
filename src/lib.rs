@@ -1,6 +1,6 @@
 //TODO docstringz yo
 
-pub const TAPE_SIZE: usize = 30_000;  //TODO consider making it unlimited to the right
+pub const TAPE_SIZE: usize = 30_000; //TODO consider making it unlimited to the right
 
 type Steps = Vec<Op>; //TODO prefer stack allocation if possible?  Vectors are convenient but heap
 
@@ -18,7 +18,8 @@ pub enum Op {
 
 struct Machine {
     tape: [u8; TAPE_SIZE],
-    pos: usize, //TODO use ptr to active cell instead of index
+    index: usize, //this feels like a clunky way to do this
+    active: Box<u8>,
     steps: Steps,
 }
 
@@ -26,46 +27,49 @@ impl Machine {
     //TODO look at using Into<Option<T>>
     //http://xion.io/post/code/rust-optional-args.html for example
     fn new(steps: Option<Steps>) -> Machine {
+        let tape: [u8; TAPE_SIZE] = [0; TAPE_SIZE];
+        let index: usize = 0;
         Machine {
-            tape: [0; TAPE_SIZE],
-            pos: 0,
+            tape: tape,
+            index: index,
+            active: Box::new(tape[index]),
             steps: steps.unwrap_or(Vec::new()),
         }
     }
-    //execute for Machine returns the Op completed, or an error code
-    //fn execute(&mut self) -> Result<Op, u8> {
+    //execute for Machine runs all steps in order
+    //fn execute(&mut self) {
 
     //}
-    //run() for machine will execute() all steps in order until empty
-
     //---Operations below---
     fn increment(&mut self) {
-        if self.tape[self.pos] < 255 {
-            self.tape[self.pos] += 1;
+        if *self.active < 255 {
+            *self.active += 1;
         } else {
-            panic!("Cell overflow at {}, could not increment", self.pos); //TODO should it wrap?
+            panic!("Cell overflow at {}, could not increment", self.index); //TODO should it wrap?
         }
     }
 
     fn decrement(&mut self) {
-        if self.tape[self.pos] > 0 {
-            self.tape[self.pos] -= 1;
+        if *self.active > 0 {
+            *self.active -= 1;
         } else {
-            panic!("Cell overflow at {}, could not decrement", self.pos);
+            panic!("Cell overflow at {}, could not decrement", self.index);
         }
     }
 
     fn move_up(&mut self) {
-        if self.pos < TAPE_SIZE - 1 {
-            self.pos += 1;
+        if self.index < TAPE_SIZE - 1 {
+            self.index += 1;
+            self.active = Box::new(self.tape[self.index]);
         } else {
             panic!("no more room on right of tape");
         }
     }
 
     fn move_down(&mut self) {
-        if self.pos > 0 {
-            self.pos -= 1;
+        if self.index > 0 {
+            self.index -= 1;
+            self.active = Box::new(self.tape[self.index]);
         } else {
             panic!("no more room on left of tape");
         }
@@ -73,10 +77,10 @@ impl Machine {
 
     fn out(&mut self) -> char {
         use std::ascii::AsciiExt;
-        if self.tape[self.pos].is_ascii() {
-        self.tape[self.pos] as char
+        if self.active.is_ascii() {
+            *self.active as char
         } else {
-            panic!("char at {} not ascii", self.pos);
+            panic!("char at {} not ascii", self.index);
         }
     }
 }
@@ -90,7 +94,7 @@ fn parse(input: &str) -> Steps {
 }
 
 pub fn run(input: &str) -> &str {
-   //let steps = parse(input);
+    //let steps = parse(input);
     //let machine = Machine::new(steps);
     //machine.execute();
     "Not Yet"
@@ -152,23 +156,23 @@ mod tests {
         use Machine;
         let mut test_machine = Machine::new(None);
         test_machine.increment();
-        assert_eq!(test_machine.tape[test_machine.pos], 1);
+        assert_eq!(*test_machine.active, 1);
     }
     #[test]
     #[should_panic(expected = "Cell overflow at 0, could not increment")]
     fn test_increment_overflow() {
         use Machine;
         let mut test_machine = Machine::new(None);
-        test_machine.tape[test_machine.pos] = 255;
+        *test_machine.active = 255;
         test_machine.increment();
     }
     #[test]
     fn test_decrement() {
         use Machine;
         let mut test_machine = Machine::new(None);
-        test_machine.tape[test_machine.pos] = 1;
+        *test_machine.active = 1;
         test_machine.decrement();
-        assert_eq!(test_machine.tape[test_machine.pos], 0);
+        assert_eq!(*test_machine.active, 0);
     }
     #[test]
     #[should_panic(expected = "Cell overflow at 0, could not decrement")]
@@ -182,7 +186,7 @@ mod tests {
         use Machine;
         let mut test_machine = Machine::new(None);
         test_machine.move_up();
-        assert_eq!(test_machine.pos, 1);
+        assert_eq!(test_machine.index, 1);
     }
     #[test]
     #[should_panic(expected = "no more room on right of tape")]
@@ -190,16 +194,17 @@ mod tests {
         use Machine;
         use TAPE_SIZE;
         let mut test_machine = Machine::new(None);
-        test_machine.pos = TAPE_SIZE - 1;
+        test_machine.index = TAPE_SIZE - 1;
+        test_machine.active = Box::new(test_machine.tape[test_machine.index]);
         test_machine.move_up();
     }
     #[test]
     fn test_move_down() {
         use Machine;
         let mut test_machine = Machine::new(None);
-        test_machine.pos = 2;
+        test_machine.index = 2;
         test_machine.move_down();
-        assert_eq!(test_machine.pos, 1);
+        assert_eq!(test_machine.index, 1);
     }
     #[test]
     #[should_panic(expected = "no more room on left of tape")]
@@ -212,15 +217,15 @@ mod tests {
     fn test_out() {
         use Machine;
         let mut test_machine = Machine::new(None);
-        test_machine.tape[test_machine.pos] = 65;
+        *test_machine.active = 65;
         assert_eq!(test_machine.out(), 'A');
-        test_machine.tape[test_machine.pos] = 97;
+        *test_machine.active = 97;
         assert_eq!(test_machine.out(), 'a');
-        test_machine.tape[test_machine.pos] = 9;
+        *test_machine.active = 9;
         assert_eq!(test_machine.out(), '\t');
-        test_machine.tape[test_machine.pos] = 0;
+        *test_machine.active = 0;
         assert_eq!(test_machine.out(), '\0');
-        test_machine.tape[test_machine.pos] = 2;
+        *test_machine.active = 2;
         assert_eq!(test_machine.out(), 2u8 as char);
     }
     #[test]
@@ -228,15 +233,13 @@ mod tests {
     fn test_out_not_ascii() {
         use Machine;
         let mut test_machine = Machine::new(None);
-        test_machine.tape[test_machine.pos] = 128;
+        *test_machine.active = 128;
         test_machine.out();
     }
     #[test]
     fn test_hello_world() {
-       use run;
-       assert_eq!(run(
-        "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
-        ),
-                 "Hello, World!");
+        use run;
+        assert_eq!(run("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."),
+                   "Hello, World!");
     }
 }
