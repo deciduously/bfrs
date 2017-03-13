@@ -22,7 +22,7 @@ struct Machine {
     active: Box<u8>,
     steps: Steps,
     loop_open: Option<usize>, //this also seems clunky
-    loop_close: Option<usize>,
+    loop_close: Option<usize>, //TODO ensure matching, i.e [], not [[]
 }
 
 impl Machine {
@@ -39,6 +39,10 @@ impl Machine {
             loop_open: None,
             loop_close: None,
         }
+    }
+
+    fn rebox(&mut self) {
+        self.active = Box::new(self.tape[self.index]);
     }
     //execute for Machine runs all steps in order
     //fn execute(&mut self) {
@@ -64,7 +68,7 @@ impl Machine {
     fn move_up(&mut self) {
         if self.index < TAPE_SIZE - 1 {
             self.index += 1;
-            self.active = Box::new(self.tape[self.index]);
+            self.rebox();
         } else {
             panic!("no more room on right of tape");
         }
@@ -73,7 +77,7 @@ impl Machine {
     fn move_down(&mut self) {
         if self.index > 0 {
             self.index -= 1;
-            self.active = Box::new(self.tape[self.index]);
+            self.rebox();
         } else {
             panic!("no more room on left of tape");
         }
@@ -92,10 +96,10 @@ impl Machine {
         self.loop_open = Some(self.index);
         if *self.active == 0 {
             self.index = self.loop_close.unwrap() + 1;
-            self.active = Box::new(self.tape[self.index]);
+            self.rebox();
         } else {
             self.index += 1;
-            self.active = Box::new(self.tape[self.index]);
+            self.rebox();
         }
     }
 
@@ -103,10 +107,10 @@ impl Machine {
         self.loop_close = Some(self.index);
         if *self.active != 0 {
             self.index = self.loop_open.unwrap() + 1;
-            self.active = Box::new(self.tape[self.index]);
+            self.rebox();
         } else {
             self.index += 1;
-            self.active = Box::new(self.tape[self.index]);
+            self.rebox();
         }
     }
 }
@@ -168,7 +172,7 @@ mod tests {
         use parse;
         use Op::*;
 
-        assert_eq!(parse("+-><.[]"), //REMEMBER TO ADD OP::IN 
+        assert_eq!(parse("+-><.[]"), //REMEMBER TO ADD OP::IN
                    [Inc, Dec, MoveUp, MoveDown, Out, Open, Close]);
     }
     #[test]
