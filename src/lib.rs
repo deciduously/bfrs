@@ -45,6 +45,20 @@ impl Machine {
     fn rebox(&mut self) {
         self.active = Box::new(self.tape[self.index]);
     }
+
+    // THIS IS YOU FROM THE FUTURE.  The BLEAK, BLEAK 7 MONTHS FUTURE.
+    // Oh gosh, I got sad.  Things got weird.
+    // And YOU ARE FUNDAMENTALLY INCORRECT ABOUT THIS but the rest of it should be ok for now.
+    // In fact, you've already done a lot of the fiddly stuff!  Yay, you.  You're pretty close.
+    //
+    // By now, though, you've learned you must AST that shizz.
+    // Which you may have been trying to do here, but I cannot tell.
+    // You know, read it in, evaluate the forms recursively, return the result.
+    // Rebox is a dumb function, you probably knew it was dumb when you wrote it but you didn't know any better.
+    // I forgive you.
+    // Go forth, present Ben.  Fuck this brain like it's probably been fucked millions of times before.
+    // Aww, yeah.
+
     //execute for Machine runs all steps in order
     //fn execute(&mut self) {
 
