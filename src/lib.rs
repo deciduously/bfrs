@@ -57,7 +57,7 @@ impl Machine {
                 Op::Dec => self.decrement(),
                 Op::MoveDown => self.move_down(),
                 Op::MoveUp => self.move_up(),
-                Op::Out => println!("{}", self.out()), // TODO
+                Op::Out => self.out(),
                 _ => panic!("Something went horribly wrong - tried to executing something that wasn't an OP")
             };
         }
@@ -95,10 +95,10 @@ impl Machine {
         }
     }
 
-    fn out(&self) -> u8 {
+    fn out(&mut self) {
         use std::ascii::AsciiExt;
         if self.tape[self.index].is_ascii() {
-            self.tape[self.index] as u8
+            self.output.push(self.tape[self.index] as u8)
         } else {
             panic!("char at {} not ascii", self.index);
         }

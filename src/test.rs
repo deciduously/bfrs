@@ -98,16 +98,26 @@ mod tests {
     fn test_out() {
         use Machine;
         let mut test_machine = Machine::new();
+
         test_machine.tape[test_machine.index] = 65;
-        assert_eq!(test_machine.out(), 'A' as u8);
+        test_machine.out();
+        assert_eq!(test_machine.output[0], 'A' as u8);
+
         test_machine.tape[test_machine.index] = 97;
-        assert_eq!(test_machine.out(), 'a' as u8);
+        test_machine.out();
+        assert_eq!(test_machine.output[1], 'a' as u8);
+
         test_machine.tape[test_machine.index] = 9;
-        assert_eq!(test_machine.out(), '\t' as u8);
+        test_machine.out();
+        assert_eq!(test_machine.output[2], '\t' as u8);
+
         test_machine.tape[test_machine.index] = 0;
-        assert_eq!(test_machine.out(), '\0' as u8);
+        test_machine.out();
+        assert_eq!(test_machine.output[3], '\0' as u8);
+
         test_machine.tape[test_machine.index] = 2;
-        assert_eq!(test_machine.out(), 2u8);
+        test_machine.out();
+        assert_eq!(test_machine.output[4], 2u8);
     }
     #[test]
     #[should_panic(expected = "char at 0 not ascii")]
