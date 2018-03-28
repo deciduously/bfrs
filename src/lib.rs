@@ -19,31 +19,21 @@ pub enum Op {
 
 struct Machine {
     tape: [u8; TAPE_SIZE],
-    index: usize, //TODO Storing the index and generating a new Box each move feels clunky
-    active: Box<u8>,
-    steps: Steps,
-    loop_open: Option<usize>, //this also seems clunky
-    loop_close: Option<usize>, //TODO ensure matching, i.e [], not [[]
+    index: usize,
+    output: Vec<u8>,
 }
 
 impl Machine {
     //TODO look at using Into<Option<T>>
     //http://xion.io/post/code/rust-optional-args.html for example
-    fn new(steps: Option<Steps>) -> Machine {
+    fn new() -> Machine {
         let tape: [u8; TAPE_SIZE] = [0; TAPE_SIZE];
         let index: usize = 0;
         Machine {
             tape: tape,
             index: index,
-            active: Box::new(tape[index]),
-            steps: steps.unwrap_or(Vec::new()),
-            loop_open: None,
-            loop_close: None,
+            output: Vec::new(),
         }
-    }
-
-    fn rebox(&mut self) {
-        self.active = Box::new(self.tape[self.index]);
     }
 
     // THIS IS YOU FROM THE FUTURE.  The BLEAK, BLEAK 7 MONTHS FUTURE.
@@ -60,21 +50,30 @@ impl Machine {
     // Aww, yeah.
 
     //execute for Machine runs all steps in order
-    //fn execute(&mut self) {
-
-    //}
+    fn execute(&mut self, steps: Steps) {
+        for step in steps.iter() {
+            match *step {
+                Op::Inc => self.increment(),
+                Op::Dec => self.decrement(),
+                Op::MoveDown => self.move_down(),
+                Op::MoveUp => self.move_up(),
+                Op::Out => println!("{}", self.out()), // TODO
+                _ => panic!("Something went horribly wrong - tried to executing something that wasn't an OP")
+            };
+        }
+    }
     //---Operations below---
     fn increment(&mut self) {
-        if *self.active < 255 {
-            *self.active += 1;
+        if self.tape[self.index] < 255 {
+            self.tape[self.index] += 1;
         } else {
             panic!("Cell overflow at {}, could not increment", self.index); //TODO should it wrap?
         }
     }
 
     fn decrement(&mut self) {
-        if *self.active > 0 {
-            *self.active -= 1;
+        if self.tape[self.index] > 0 {
+            self.tape[self.index] -= 1;
         } else {
             panic!("Cell overflow at {}, could not decrement", self.index);
         }
@@ -83,7 +82,6 @@ impl Machine {
     fn move_up(&mut self) {
         if self.index < TAPE_SIZE - 1 {
             self.index += 1;
-            self.rebox();
         } else {
             panic!("no more room on right of tape");
         }
@@ -92,42 +90,41 @@ impl Machine {
     fn move_down(&mut self) {
         if self.index > 0 {
             self.index -= 1;
-            self.rebox();
         } else {
             panic!("no more room on left of tape");
         }
     }
 
-    fn out(&self) -> char {
+    fn out(&self) -> u8 {
         use std::ascii::AsciiExt;
-        if self.active.is_ascii() {
-            *self.active as char
+        if self.tape[self.index].is_ascii() {
+            self.tape[self.index] as u8
         } else {
             panic!("char at {} not ascii", self.index);
         }
     }
 
-    fn open(&mut self) {
-        self.loop_open = Some(self.index);
-        if *self.active == 0 {
-            self.index = self.loop_close.unwrap() + 1;
-            self.rebox();
-        } else {
-            self.index += 1;
-            self.rebox();
-        }
-    }
+    //fn open(&mut self) {
+    //    self.loop_open = Some(self.index);
+    //    if *self.active == 0 {
+    //        self.index = self.loop_close.unwrap() + 1;
+    //        self.rebox();
+    //    } else {
+    //        self.index += 1;
+    //        self.rebox();
+    //    }
+    //}
 
-    fn close(&mut self) {
-        self.loop_close = Some(self.index);
-        if *self.active != 0 {
-            self.index = self.loop_open.unwrap() + 1;
-            self.rebox();
-        } else {
-            self.index += 1;
-            self.rebox();
-        }
-    }
+    //fn close(&mut self) {
+    //    self.loop_close = Some(self.index);
+    //    if *self.active != 0 {
+    //        self.index = self.loop_open.unwrap() + 1;
+    //        self.rebox();
+    //    } else {
+    //        self.index += 1;
+    //        self.rebox();
+    //    }
+   //}
 }
 
 fn parse(input: &str) -> Steps {
@@ -138,11 +135,11 @@ fn parse(input: &str) -> Steps {
     ret
 }
 
-pub fn run(input: &str) -> &str {
-    //let steps = parse(input);
-    //let machine = Machine::new(steps);
-    //machine.execute();
-    "Not Yet"
+pub fn run(input: &str) -> String {
+    let steps = parse(input);
+    let mut machine = Machine::new();
+    machine.execute(steps);
+    String::from_utf8(machine.output).unwrap()
 }
 
 pub fn translate(symbol: char) -> Op {

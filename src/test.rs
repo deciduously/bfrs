@@ -36,37 +36,37 @@ mod tests {
     #[test]
     fn test_increment() {
         use Machine;
-        let mut test_machine = Machine::new(None);
+        let mut test_machine = Machine::new();
         test_machine.increment();
-        assert_eq!(*test_machine.active, 1);
+        assert_eq!(test_machine.tape[test_machine.index], 1);
     }
     #[test]
     #[should_panic(expected = "Cell overflow at 0, could not increment")]
     fn test_increment_overflow() {
         use Machine;
-        let mut test_machine = Machine::new(None);
-        *test_machine.active = 255;
+        let mut test_machine = Machine::new();
+        test_machine.tape[test_machine.index] = 255;
         test_machine.increment();
     }
     #[test]
     fn test_decrement() {
         use Machine;
-        let mut test_machine = Machine::new(None);
-        *test_machine.active = 1;
+        let mut test_machine = Machine::new();
+        test_machine.tape[test_machine.index] = 1;
         test_machine.decrement();
-        assert_eq!(*test_machine.active, 0);
+        assert_eq!(test_machine.tape[test_machine.index], 0);
     }
     #[test]
     #[should_panic(expected = "Cell overflow at 0, could not decrement")]
     fn test_decrement_overflow() {
         use Machine;
-        let mut test_machine = Machine::new(None);
+        let mut test_machine = Machine::new();
         test_machine.decrement();
     }
     #[test]
     fn test_move_up() {
         use Machine;
-        let mut test_machine = Machine::new(None);
+        let mut test_machine = Machine::new();
         test_machine.move_up();
         assert_eq!(test_machine.index, 1);
     }
@@ -75,15 +75,14 @@ mod tests {
     fn test_move_up_panic() {
         use Machine;
         use TAPE_SIZE;
-        let mut test_machine = Machine::new(None);
+        let mut test_machine = Machine::new();
         test_machine.index = TAPE_SIZE - 1;
-        test_machine.active = Box::new(test_machine.tape[test_machine.index]);
         test_machine.move_up();
     }
     #[test]
     fn test_move_down() {
         use Machine;
-        let mut test_machine = Machine::new(None);
+        let mut test_machine = Machine::new();
         test_machine.index = 2;
         test_machine.move_down();
         assert_eq!(test_machine.index, 1);
@@ -92,30 +91,30 @@ mod tests {
     #[should_panic(expected = "no more room on left of tape")]
     fn test_move_down_panic() {
         use Machine;
-        let mut test_machine = Machine::new(None);
+        let mut test_machine = Machine::new();
         test_machine.move_down();
     }
     #[test]
     fn test_out() {
         use Machine;
-        let mut test_machine = Machine::new(None);
-        *test_machine.active = 65;
-        assert_eq!(test_machine.out(), 'A');
-        *test_machine.active = 97;
-        assert_eq!(test_machine.out(), 'a');
-        *test_machine.active = 9;
-        assert_eq!(test_machine.out(), '\t');
-        *test_machine.active = 0;
-        assert_eq!(test_machine.out(), '\0');
-        *test_machine.active = 2;
-        assert_eq!(test_machine.out(), 2u8 as char);
+        let mut test_machine = Machine::new();
+        test_machine.tape[test_machine.index] = 65;
+        assert_eq!(test_machine.out(), 'A' as u8);
+        test_machine.tape[test_machine.index] = 97;
+        assert_eq!(test_machine.out(), 'a' as u8);
+        test_machine.tape[test_machine.index] = 9;
+        assert_eq!(test_machine.out(), '\t' as u8);
+        test_machine.tape[test_machine.index] = 0;
+        assert_eq!(test_machine.out(), '\0' as u8);
+        test_machine.tape[test_machine.index] = 2;
+        assert_eq!(test_machine.out(), 2u8);
     }
     #[test]
     #[should_panic(expected = "char at 0 not ascii")]
     fn test_out_not_ascii() {
         use Machine;
-        let mut test_machine = Machine::new(None);
-        *test_machine.active = 128;
+        let mut test_machine = Machine::new();
+        test_machine.tape[test_machine.index] = 128;
         test_machine.out();
     }
     #[test]
@@ -123,5 +122,10 @@ mod tests {
         use run;
         assert_eq!(run("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."),
                    "Hello, World!");
+    }
+    #[test]
+    fn test_no_loops() {
+        use run;
+        assert_eq!(run("++++++++++."), "10");
     }
 }
