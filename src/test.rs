@@ -1,9 +1,10 @@
 #[cfg(test)]
-mod tests {
+use machine::Machine;
+use parse::Op::*;
+use parse::*;
+
     #[test]
     fn test_translate() {
-        use translate;
-        use Op::*;
         assert_eq!(translate('+'), Inc);
         assert_eq!(translate('-'), Dec);
         assert_eq!(translate('<'), MoveDown);
@@ -16,14 +17,10 @@ mod tests {
     #[test]
     #[should_panic(expected = "Unrecognized char: x")]
     fn test_translate_unrecognized() {
-        use translate;
         translate('x');
     }
     #[test]
     fn test_parse() {
-        use parse;
-        use Op::*;
-
         assert_eq!(
             parse("+-><.[]"), //REMEMBER TO ADD OP::IN
             [Inc, Dec, MoveUp, MoveDown, Out, Open, Close]
@@ -32,19 +29,16 @@ mod tests {
     #[test]
     #[should_panic(expected = "Unrecognized char: x")]
     fn test_parse_illegal() {
-        use parse;
         parse("+-><.[]x"); //REMEMBER TO ADD OP::IN
     }
     #[test]
     fn test_increment() {
-        use Machine;
         let mut test_machine = Machine::new(Vec::new());
         test_machine.increment();
         assert_eq!(test_machine.tape[test_machine.index], 1);
     }
     #[test]
     fn test_decrement() {
-        use Machine;
         let mut test_machine = Machine::new(Vec::new());
         test_machine.tape[test_machine.index] = 1;
         test_machine.decrement();
@@ -53,20 +47,17 @@ mod tests {
     #[test]
     #[should_panic(expected = "Cell overflow at 0, could not decrement")]
     fn test_decrement_overflow() {
-        use Machine;
         let mut test_machine = Machine::new(Vec::new());
         test_machine.decrement();
     }
     #[test]
     fn test_move_up() {
-        use Machine;
         let mut test_machine = Machine::new(Vec::new());
         test_machine.move_up();
         assert_eq!(test_machine.index, 1);
     }
     #[test]
     fn test_move_down() {
-        use Machine;
         let mut test_machine = Machine::new(Vec::new());
         test_machine.index = 2;
         test_machine.move_down();
@@ -75,13 +66,11 @@ mod tests {
     #[test]
     #[should_panic(expected = "no more room on left of tape")]
     fn test_move_down_panic() {
-        use Machine;
         let mut test_machine = Machine::new(Vec::new());
         test_machine.move_down();
     }
     #[test]
     fn test_out() {
-        use Machine;
         let mut test_machine = Machine::new(Vec::new());
 
         test_machine.tape[test_machine.index] = 65;
@@ -107,20 +96,19 @@ mod tests {
     #[test]
     #[should_panic(expected = "char at 0 not ascii")]
     fn test_out_not_ascii() {
-        use Machine;
         let mut test_machine = Machine::new(Vec::new());
         test_machine.tape[test_machine.index] = 128;
         test_machine.out();
     }
     #[test]
     fn test_hello_world() {
-        use run;
+        use super::run;
         assert_eq!(run("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."),
                    "Hello World!\n");
     }
     #[test]
     fn test_no_loops() {
-        use run;
+        use super::run;
         assert_eq!(
             run("++++++++++++++++++++++++++++++++++++++++++++++++."),
             "0"
@@ -128,7 +116,6 @@ mod tests {
     }
     #[test]
     fn test_simple_loop() {
-        use run;
+        use super::run;
         assert_eq!(run("++>+++++[<+>-]++++++++[<++++++>-]<."), "7")
     }
-}

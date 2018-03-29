@@ -3,4 +3,12 @@ name = "bfrs"
 version = "0.1.0"
 authors = ["deciduously <bendlovy@gmail.com>"]
 
+[lib]
+name = "bfrs"
+path = "src/lib.rs"
+
+[[bin]]
+name = "bfrsc"
+path = "src/main.rs"
+
 [dependencies]
