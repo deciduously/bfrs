@@ -23,6 +23,7 @@ impl Machine {
 
     //execute runs all steps in order
     pub fn execute(&mut self, debug: bool) {
+        // TODO make this a Result
         while self.pstep < self.prog.len() {
             if debug {
                 println!("{:?}", self);
