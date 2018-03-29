@@ -3,7 +3,7 @@
 
 Quick 'n dirty [BrainFuck](https://en.wikipedia.org/wiki/Brainfuck) interpereter in Rust.
 ## Dependencies
-Rust
+Rust 1.25.0 or higher (I jumped on those nested import groups).
 ## Usage
 Use 'cargo build' to generate the executable `bfrsc`, which accepts a Brainfuck program as its first argument.  Use for example `cargo run resource/sierpinksi.b` to do it all in one fell swoop.  Use `cargo test` to run the tests.
 
