@@ -7,7 +7,7 @@ pub enum Op {
     MoveUp,
     MoveDown,
     Out,
-    //In, --NOT REQUIRED FOR GETTING HELLO_WORLD TO PASS
+    In,
     Open,
     Close,
 }
@@ -29,9 +29,9 @@ pub fn translate(symbol: char) -> Op {
         '>' => MoveUp,
         '<' => MoveDown,
         '.' => Out,
-        //',' => In, --NOT REQUIRED FOR HELLO_WORLD
+        ',' => In,
         '[' => Open,
         ']' => Close,
-        _ => panic!("Unrecognized char: {}", symbol),
+        _ => panic!("Unrecognized char: {}", symbol), //TODO comments, not errors
     }
 }

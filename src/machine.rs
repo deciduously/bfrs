@@ -1,4 +1,5 @@
 use parse::{Op, Prog};
+use std::io::{Read, stdin};
 
 #[derive(Debug)]
 pub struct Machine {
@@ -23,21 +24,24 @@ impl Machine {
         }
     }
 
-    //execute for Machine runs all steps in order
+    //execute runs all steps in order
     pub fn execute(&mut self, debug: bool) {
         while self.pstep < self.prog.len() {
             if debug {
                 println!("{:?}", self);
             }
+
             match self.prog[self.pstep] {
                 Op::Inc => self.increment(),
                 Op::Dec => self.decrement(),
                 Op::MoveDown => self.move_down(),
                 Op::MoveUp => self.move_up(),
                 Op::Out => self.out(),
+                Op::In => self.input(),
                 Op::Open => self.open(),
                 Op::Close => self.close(),
             };
+
             self.pstep += 1;
         }
     }
@@ -76,6 +80,13 @@ impl Machine {
         } else {
             panic!("char at {} not ascii", self.index);
         }
+    }
+
+    pub fn input(&mut self) {
+        let mut in_char: [u8; 1] = [0];
+        stdin().read_exact(&mut in_char).expect("Could not read byte");
+        println!("{:?}", in_char);
+        self.tape[self.index] = in_char[0];
     }
 
     pub fn open(&mut self) {

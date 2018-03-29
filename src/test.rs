@@ -10,7 +10,7 @@ fn test_translate() {
     assert_eq!(translate('<'), MoveDown);
     assert_eq!(translate('>'), MoveUp);
     assert_eq!(translate('.'), Out);
-    //assert_eq!(translate(','), In);  --NOT REQUIRED FOR HELLO_WORLD
+    assert_eq!(translate(','), In);
     assert_eq!(translate('['), Open);
     assert_eq!(translate(']'), Close);
 }
@@ -22,14 +22,14 @@ fn test_translate_unrecognized() {
 #[test]
 fn test_parse() {
     assert_eq!(
-        parse("+-><.[]"), //REMEMBER TO ADD OP::IN
-        [Inc, Dec, MoveUp, MoveDown, Out, Open, Close]
+        parse("+-><.,[]"),
+        [Inc, Dec, MoveUp, MoveDown, Out, In, Open, Close]
     );
 }
 #[test]
 #[should_panic(expected = "Unrecognized char: x")]
 fn test_parse_illegal() {
-    parse("+-><.[]x"); //REMEMBER TO ADD OP::IN
+    parse("+-><.,[]x");
 }
 #[test]
 fn test_increment() {
