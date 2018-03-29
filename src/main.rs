@@ -1,10 +1,10 @@
 extern crate bfrs;
 
 use bfrs::run::run;
-use std::{env, fs::File, io::{BufReader, Read, Result}, path::Path, process::exit};
+use std::{env, fs::File, io::{self, BufReader, Read}, path::Path, process::exit};
 
 //TODO BfString type
-fn get_bf(file_path: &str) -> Result<String> {
+fn get_bf(file_path: &str) -> io::Result<String> {
     let file = File::open(Path::new(file_path))?;
 
     let mut buf_reader = BufReader::new(file);
