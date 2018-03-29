@@ -12,13 +12,10 @@ pub struct Machine {
 
 impl Machine {
     pub fn new(prog: Prog) -> Machine {
-        let tape: Vec<u8> = vec![0];
-        let index: usize = 0;
-        let pstep: usize = 0;
         Machine {
-            tape,
-            index,
-            pstep,
+            tape: vec![0],
+            index: 0,
+            pstep: 0,
             prog,
             output: Vec::new(),
         }
