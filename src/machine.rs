@@ -1,5 +1,6 @@
 use parse::{Op, Prog};
 
+#[derive(Debug)]
 pub struct Machine {
     pub tape: Vec<u8>,
     pub index: usize,
@@ -23,9 +24,11 @@ impl Machine {
     }
 
     //execute for Machine runs all steps in order
-    pub fn execute(&mut self) {
+    pub fn execute(&mut self, debug: bool) {
         while self.pstep < self.prog.len() {
-            //self.dump(); // TODO cmdline option for debug
+            if debug {
+                println!("{:?}", self);
+            }
             match self.prog[self.pstep] {
                 Op::Inc => self.increment(),
                 Op::Dec => self.decrement(),
@@ -37,14 +40,6 @@ impl Machine {
             };
             self.pstep += 1;
         }
-    }
-
-    //todo Impl Debug
-    pub fn dump(&self) {
-        println!(
-            "tape={:?}\nindex={}\npstep={}",
-            self.tape, self.index, self.pstep
-        );
     }
 
     //---Operations below---
