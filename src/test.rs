@@ -5,19 +5,15 @@ use parse::*;
 
 #[test]
 fn test_translate() {
-    assert_eq!(translate('+'), Inc);
-    assert_eq!(translate('-'), Dec);
-    assert_eq!(translate('<'), MoveDown);
-    assert_eq!(translate('>'), MoveUp);
-    assert_eq!(translate('.'), Out);
-    assert_eq!(translate(','), In);
-    assert_eq!(translate('['), Open);
-    assert_eq!(translate(']'), Close);
-}
-#[test]
-#[should_panic(expected = "Unrecognized char: x")]
-fn test_translate_unrecognized() {
-    translate('x');
+    assert_eq!(translate('+'), Some(Inc));
+    assert_eq!(translate('-'), Some(Dec));
+    assert_eq!(translate('<'), Some(MoveDown));
+    assert_eq!(translate('>'), Some(MoveUp));
+    assert_eq!(translate('.'), Some(Out));
+    assert_eq!(translate(','), Some(In));
+    assert_eq!(translate('['), Some(Open));
+    assert_eq!(translate(']'), Some(Close));
+    assert_eq!(translate('x'), None);
 }
 #[test]
 fn test_parse() {
@@ -27,9 +23,11 @@ fn test_parse() {
     );
 }
 #[test]
-#[should_panic(expected = "Unrecognized char: x")]
 fn test_parse_illegal() {
-    parse("+-><.,[]x");
+    assert_eq!(
+        parse("+-><.,[]x"),
+        [Inc, Dec, MoveUp, MoveDown, Out, In, Open, Close]
+    );
 }
 #[test]
 fn test_increment() {

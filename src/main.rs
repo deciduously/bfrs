@@ -1,16 +1,7 @@
 extern crate bfrs;
 
 use bfrs::run;
-use std::{
-    env,
-    fs::File,
-    io::{
-        BufReader,
-        Read,
-        Result
-    },
-    path::Path
-};
+use std::{env, fs::File, io::{BufReader, Read, Result}, path::Path};
 
 //TODO BfString type
 fn get_bf(file_path: &str) -> Result<String> {

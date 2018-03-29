@@ -1,5 +1,5 @@
 use parse::{Op, Prog};
-use std::io::{Read, stdin};
+use std::io::{stdin, Read};
 
 #[derive(Debug)]
 pub struct Machine {
@@ -84,7 +84,9 @@ impl Machine {
 
     pub fn input(&mut self) {
         let mut in_char: [u8; 1] = [0];
-        stdin().read_exact(&mut in_char).expect("Could not read byte");
+        stdin()
+            .read_exact(&mut in_char)
+            .expect("Could not read byte");
         println!("{:?}", in_char);
         self.tape[self.index] = in_char[0];
     }

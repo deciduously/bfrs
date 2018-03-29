@@ -15,23 +15,25 @@ pub enum Op {
 pub fn parse(input: &str) -> Prog {
     let mut ret = Vec::new();
     for c in input.chars() {
-        ret.push(translate(c));
+        if let Some(op) = translate(c) {
+            ret.push(op);
+        }
     }
     ret
 }
 
-pub fn translate(symbol: char) -> Op {
+pub fn translate(symbol: char) -> Option<Op> {
     use self::Op::*;
 
     match symbol {
-        '+' => Inc,
-        '-' => Dec,
-        '>' => MoveUp,
-        '<' => MoveDown,
-        '.' => Out,
-        ',' => In,
-        '[' => Open,
-        ']' => Close,
-        _ => panic!("Unrecognized char: {}", symbol), //TODO comments, not errors
+        '+' => Some(Inc),
+        '-' => Some(Dec),
+        '>' => Some(MoveUp),
+        '<' => Some(MoveDown),
+        '.' => Some(Out),
+        ',' => Some(In),
+        '[' => Some(Open),
+        ']' => Some(Close),
+        _ => None,
     }
 }
