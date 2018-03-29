@@ -3,9 +3,13 @@
 
 Quick 'n dirty [BrainFuck](https://en.wikipedia.org/wiki/Brainfuck) interpereter in Rust.
 ## Dependencies
-Rust 1.25.0 or higher (I jumped on those nested import groups).
+Rust 1.25.0 or higher (I jumped on those nested import groups).  Or download the 64-bit Linux binary from [releases](https://github.com/deciduously/bfrs/releases).
 ## Usage
-Use 'cargo build' to generate the executable `bfrsc`, which accepts a Brainfuck program as its first argument.  Use for example `cargo run resource/sierpinksi.b` to do it all in one fell swoop.  Use `cargo test` to run the tests.
+`bfrsc` accepts a brainfuck file as its first argument, and optionally a second argument of either `-d` or `--debug` to dump machine state after each instruction, which is obnoxious. For example: `bfrsc resoure/sierpinski.b -d`.
+## Development
+Use [cargo](https://doc.rust-lang.org/stable/cargo) run, test, install, --release, etc.
+## Performance
+Dismal.
 
 On my machine (AMD A10-5750M) it runs `benchmark.b` in 13.21 seconds and [`mandlebrot.b`](https://github.com/kostya/benchmarks/blob/master/brainfuck2/mandel.b) in 221.16 seconds.
 ## Acknowledgements
