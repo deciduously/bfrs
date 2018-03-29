@@ -87,7 +87,6 @@ impl Machine {
         stdin()
             .read_exact(&mut in_char)
             .expect("Could not read byte");
-        println!("{:?}", in_char);
         self.tape[self.index] = in_char[0];
     }
 
