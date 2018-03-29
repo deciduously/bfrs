@@ -1,7 +1,7 @@
 extern crate bfrs;
 
 use bfrs::run;
-use std::{env, fs::File, io::{BufReader, Read, Result}, path::Path};
+use std::{env, fs::File, io::{BufReader, Read, Result}, path::Path, process::exit};
 
 //TODO BfString type
 fn get_bf(file_path: &str) -> Result<String> {
@@ -17,7 +17,8 @@ fn main() {
     let file_path = if let Some(arg1) = env::args().nth(1) {
         arg1
     } else {
-        panic!("Please specify a file");
+        println!("Usage: bfrsc file.bf <-d||--debug>");
+        exit(1);
     };
 
     let debug = if let Some(arg2) = env::args().nth(2) {
