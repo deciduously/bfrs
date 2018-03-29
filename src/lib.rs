@@ -20,48 +20,47 @@ pub enum Op {
 struct Machine {
     tape: [u8; TAPE_SIZE],
     index: usize,
+    pstep: usize,
+    steps: Steps,
     output: Vec<u8>,
 }
 
 impl Machine {
     //TODO look at using Into<Option<T>>
     //http://xion.io/post/code/rust-optional-args.html for example
-    fn new() -> Machine {
+    fn new(steps: Steps) -> Machine {
         let tape: [u8; TAPE_SIZE] = [0; TAPE_SIZE];
         let index: usize = 0;
+        let pstep: usize = 0;
         Machine {
-            tape: tape,
-            index: index,
+            tape,
+            index,
+            pstep,
+            steps,
             output: Vec::new(),
         }
     }
 
-    // THIS IS YOU FROM THE FUTURE.  The BLEAK, BLEAK 7 MONTHS FUTURE.
-    // Oh gosh, I got sad.  Things got weird.
-    // And YOU ARE FUNDAMENTALLY INCORRECT ABOUT THIS but the rest of it should be ok for now.
-    // In fact, you've already done a lot of the fiddly stuff!  Yay, you.  You're pretty close.
-    //
-    // By now, though, you've learned you must AST that shizz.
-    // Which you may have been trying to do here, but I cannot tell.
-    // You know, read it in, evaluate the forms recursively, return the result.
-    // Rebox is a dumb function, you probably knew it was dumb when you wrote it but you didn't know any better.
-    // I forgive you.
-    // Go forth, present Ben.  Fuck this brain like it's probably been fucked millions of times before.
-    // Aww, yeah.
-
     //execute for Machine runs all steps in order
-    fn execute(&mut self, steps: Steps) {
-        for step in steps.iter() {
-            match *step {
+    fn execute(&mut self) {
+        while self.pstep < self.steps.len() {
+            match self.steps[self.pstep] {
                 Op::Inc => self.increment(),
                 Op::Dec => self.decrement(),
                 Op::MoveDown => self.move_down(),
                 Op::MoveUp => self.move_up(),
                 Op::Out => self.out(),
-                _ => panic!("Something went horribly wrong - tried to executing something that wasn't an OP")
+                Op::Open => self.open(),
+                Op::Close => self.close(),
             };
+            self.dump(); // DEBUG
+            self.pstep += 1;
         }
     }
+    fn dump(&self) {
+        println!("tape at index={:?}\nindex={}\npstep={}", self.tape[self.index], self.index, self.pstep);
+    }
+
     //---Operations below---
     fn increment(&mut self) {
         if self.tape[self.index] < 255 {
@@ -96,7 +95,6 @@ impl Machine {
     }
 
     fn out(&mut self) {
-        use std::ascii::AsciiExt;
         if self.tape[self.index].is_ascii() {
             self.output.push(self.tape[self.index] as u8)
         } else {
@@ -104,27 +102,33 @@ impl Machine {
         }
     }
 
-    //fn open(&mut self) {
-    //    self.loop_open = Some(self.index);
-    //    if *self.active == 0 {
-    //        self.index = self.loop_close.unwrap() + 1;
-    //        self.rebox();
-    //    } else {
-    //        self.index += 1;
-    //        self.rebox();
-    //    }
-    //}
+    fn open(&mut self) {
+        let mut bal = 1;
+        if self.tape[self.index] == '0' as u8 {
+            loop {
+                self.pstep += 1;
+                if self.steps[self.pstep] == Op::Open {
+                    bal += 1;
+                } else if self.steps[self.pstep] == Op::Close {
+                    bal -= 1;
+                }
+                if bal == 0 { break; }
+            }
+        }
+    }
 
-    //fn close(&mut self) {
-    //    self.loop_close = Some(self.index);
-    //    if *self.active != 0 {
-    //        self.index = self.loop_open.unwrap() + 1;
-    //        self.rebox();
-    //    } else {
-    //        self.index += 1;
-    //        self.rebox();
-    //    }
-   //}
+    fn close(&mut self) {
+        let mut bal = 0;
+        loop {
+            if self.steps[self.pstep] == Op::Open {
+                bal += 1;
+            } else if self.steps[self.pstep] == Op::Close {
+                bal -= 1;
+            }
+            self.pstep -= 1; // TODO find a better way than unwinding the stack
+            if bal == 0 { break; }
+        }
+    }
 }
 
 fn parse(input: &str) -> Steps {
@@ -137,8 +141,8 @@ fn parse(input: &str) -> Steps {
 
 pub fn run(input: &str) -> String {
     let steps = parse(input);
-    let mut machine = Machine::new();
-    machine.execute(steps);
+    let mut machine = Machine::new(steps);
+    machine.execute();
     String::from_utf8(machine.output).unwrap()
 }
 

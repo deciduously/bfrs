@@ -36,7 +36,7 @@ mod tests {
     #[test]
     fn test_increment() {
         use Machine;
-        let mut test_machine = Machine::new();
+        let mut test_machine = Machine::new(Vec::new());
         test_machine.increment();
         assert_eq!(test_machine.tape[test_machine.index], 1);
     }
@@ -44,14 +44,14 @@ mod tests {
     #[should_panic(expected = "Cell overflow at 0, could not increment")]
     fn test_increment_overflow() {
         use Machine;
-        let mut test_machine = Machine::new();
+        let mut test_machine = Machine::new(Vec::new());
         test_machine.tape[test_machine.index] = 255;
         test_machine.increment();
     }
     #[test]
     fn test_decrement() {
         use Machine;
-        let mut test_machine = Machine::new();
+        let mut test_machine = Machine::new(Vec::new());
         test_machine.tape[test_machine.index] = 1;
         test_machine.decrement();
         assert_eq!(test_machine.tape[test_machine.index], 0);
@@ -60,13 +60,13 @@ mod tests {
     #[should_panic(expected = "Cell overflow at 0, could not decrement")]
     fn test_decrement_overflow() {
         use Machine;
-        let mut test_machine = Machine::new();
+        let mut test_machine = Machine::new(Vec::new());
         test_machine.decrement();
     }
     #[test]
     fn test_move_up() {
         use Machine;
-        let mut test_machine = Machine::new();
+        let mut test_machine = Machine::new(Vec::new());
         test_machine.move_up();
         assert_eq!(test_machine.index, 1);
     }
@@ -75,14 +75,14 @@ mod tests {
     fn test_move_up_panic() {
         use Machine;
         use TAPE_SIZE;
-        let mut test_machine = Machine::new();
+        let mut test_machine = Machine::new(Vec::new());
         test_machine.index = TAPE_SIZE - 1;
         test_machine.move_up();
     }
     #[test]
     fn test_move_down() {
         use Machine;
-        let mut test_machine = Machine::new();
+        let mut test_machine = Machine::new(Vec::new());
         test_machine.index = 2;
         test_machine.move_down();
         assert_eq!(test_machine.index, 1);
@@ -91,13 +91,13 @@ mod tests {
     #[should_panic(expected = "no more room on left of tape")]
     fn test_move_down_panic() {
         use Machine;
-        let mut test_machine = Machine::new();
+        let mut test_machine = Machine::new(Vec::new());
         test_machine.move_down();
     }
     #[test]
     fn test_out() {
         use Machine;
-        let mut test_machine = Machine::new();
+        let mut test_machine = Machine::new(Vec::new());
 
         test_machine.tape[test_machine.index] = 65;
         test_machine.out();
@@ -123,7 +123,7 @@ mod tests {
     #[should_panic(expected = "char at 0 not ascii")]
     fn test_out_not_ascii() {
         use Machine;
-        let mut test_machine = Machine::new();
+        let mut test_machine = Machine::new(Vec::new());
         test_machine.tape[test_machine.index] = 128;
         test_machine.out();
     }
@@ -136,6 +136,11 @@ mod tests {
     #[test]
     fn test_no_loops() {
         use run;
-        assert_eq!(run("++++++++++."), "10");
+        assert_eq!(run("++++++++++++++++++++++++++++++++++++++++++++++++."), "0")
+    }
+    #[test]
+    fn test_simple_loop() {
+        use run;
+        assert_eq!(run("++++[-]"), "")
     }
 }
