@@ -1,6 +1,6 @@
 extern crate bfrs;
 
-use bfrs::run;
+use bfrs::run::run;
 use std::{env, fs::File, io::{BufReader, Read, Result}, path::Path, process::exit};
 
 //TODO BfString type

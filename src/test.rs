@@ -1,7 +1,11 @@
 #[cfg(test)]
 use machine::Machine;
+#[cfg(test)]
 use parse::Op::*;
+#[cfg(test)]
 use parse::*;
+#[cfg(test)]
+use run::*;
 
 #[test]
 fn test_translate() {
@@ -94,13 +98,11 @@ fn test_out_not_ascii() {
 }
 #[test]
 fn test_hello_world() {
-    use super::run;
     assert_eq!(run("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.", false),
                    "Hello World!\n");
 }
 #[test]
 fn test_no_loops() {
-    use super::run;
     assert_eq!(
         run("++++++++++++++++++++++++++++++++++++++++++++++++.", false),
         "0"
@@ -108,6 +110,5 @@ fn test_no_loops() {
 }
 #[test]
 fn test_simple_loop() {
-    use super::run;
     assert_eq!(run("++>+++++[<+>-]++++++++[<++++++>-]<.", false), "7")
 }
