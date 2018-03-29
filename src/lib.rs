@@ -12,4 +12,3 @@ pub fn run(input: &str) -> String {
     machine.execute();
     String::from_utf8(machine.output).unwrap()
 }
-

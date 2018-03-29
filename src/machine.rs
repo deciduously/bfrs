@@ -1,4 +1,4 @@
-use parse::{Prog, Op};
+use parse::{Op, Prog};
 
 pub struct Machine {
     pub tape: Vec<u8>,
