@@ -1,7 +1,7 @@
 //TODO docstringz yo
 mod test;
 
-pub const TAPE_SIZE: usize = 30_000; //TODO consider making it unlimited to the right
+//pub const TAPE_SIZE: usize = 30_000;
 
 type Steps = Vec<Op>;
 
@@ -18,7 +18,7 @@ pub enum Op {
 }
 
 struct Machine {
-    tape: [u8; TAPE_SIZE],
+    tape: Vec<u8>,
     index: usize,
     pstep: usize,
     steps: Steps,
@@ -29,7 +29,7 @@ impl Machine {
     //TODO look at using Into<Option<T>>
     //http://xion.io/post/code/rust-optional-args.html for example
     fn new(steps: Steps) -> Machine {
-        let tape: [u8; TAPE_SIZE] = [0; TAPE_SIZE];
+        let tape: Vec<u8> = vec![0];
         let index: usize = 0;
         let pstep: usize = 0;
         Machine {
@@ -79,11 +79,10 @@ impl Machine {
     }
 
     fn move_up(&mut self) {
-        if self.index < TAPE_SIZE - 1 {
-            self.index += 1;
-        } else {
-            panic!("no more room on right of tape");
+        if self.index == self.tape.len() {
+            self.tape.push(0);
         }
+        self.index += 1;
     }
 
     fn move_down(&mut self) {

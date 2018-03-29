@@ -71,15 +71,6 @@ mod tests {
         assert_eq!(test_machine.index, 1);
     }
     #[test]
-    #[should_panic(expected = "no more room on right of tape")]
-    fn test_move_up_panic() {
-        use Machine;
-        use TAPE_SIZE;
-        let mut test_machine = Machine::new(Vec::new());
-        test_machine.index = TAPE_SIZE - 1;
-        test_machine.move_up();
-    }
-    #[test]
     fn test_move_down() {
         use Machine;
         let mut test_machine = Machine::new(Vec::new());
