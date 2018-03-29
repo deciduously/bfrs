@@ -48,14 +48,18 @@ impl Machine {
 
     //---Operations below---
     pub fn increment(&mut self) {
-        self.tape[self.index] += 1;
+        if self.tape[self.index] == 255 {
+            self.tape[self.index] = 0;
+        } else {
+            self.tape[self.index] += 1;
+        }
     }
 
     pub fn decrement(&mut self) {
-        if self.tape[self.index] > 0 {
-            self.tape[self.index] -= 1;
+        if self.tape[self.index] == 0 {
+            self.tape[self.index] = 255;
         } else {
-            panic!("Cell overflow at {}, could not decrement", self.index);
+            self.tape[self.index] -= 1;
         }
     }
 

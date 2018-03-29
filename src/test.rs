@@ -43,12 +43,6 @@ fn test_decrement() {
     assert_eq!(test_machine.tape[test_machine.index], 0);
 }
 #[test]
-#[should_panic(expected = "Cell overflow at 0, could not decrement")]
-fn test_decrement_overflow() {
-    let mut test_machine = Machine::new(Vec::new());
-    test_machine.decrement();
-}
-#[test]
 fn test_move_up() {
     let mut test_machine = Machine::new(Vec::new());
     test_machine.move_up();
