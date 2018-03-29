@@ -44,6 +44,7 @@ impl Machine {
     //execute for Machine runs all steps in order
     fn execute(&mut self) {
         while self.pstep < self.steps.len() {
+            self.dump(); // DEBUG
             match self.steps[self.pstep] {
                 Op::Inc => self.increment(),
                 Op::Dec => self.decrement(),
@@ -53,21 +54,19 @@ impl Machine {
                 Op::Open => self.open(),
                 Op::Close => self.close(),
             };
-            self.dump(); // DEBUG
             self.pstep += 1;
         }
     }
     fn dump(&self) {
-        println!("tape at index={:?}\nindex={}\npstep={}", self.tape[self.index], self.index, self.pstep);
+        println!(
+            "tape={:?}\nindex={}\npstep={}",
+            self.tape, self.index, self.pstep
+        );
     }
 
     //---Operations below---
     fn increment(&mut self) {
-        if self.tape[self.index] < 255 {
-            self.tape[self.index] += 1;
-        } else {
-            panic!("Cell overflow at {}, could not increment", self.index); //TODO should it wrap?
-        }
+        self.tape[self.index] += 1;
     }
 
     fn decrement(&mut self) {
@@ -79,7 +78,7 @@ impl Machine {
     }
 
     fn move_up(&mut self) {
-        if self.index == self.tape.len() {
+        if self.index == self.tape.len() - 1 {
             self.tape.push(0);
         }
         self.index += 1;
@@ -103,7 +102,7 @@ impl Machine {
 
     fn open(&mut self) {
         let mut bal = 1;
-        if self.tape[self.index] == '0' as u8 {
+        if self.tape[self.index] == 0 {
             loop {
                 self.pstep += 1;
                 if self.steps[self.pstep] == Op::Open {
@@ -111,7 +110,9 @@ impl Machine {
                 } else if self.steps[self.pstep] == Op::Close {
                     bal -= 1;
                 }
-                if bal == 0 { break; }
+                if bal == 0 {
+                    break;
+                }
             }
         }
     }
@@ -125,7 +126,9 @@ impl Machine {
                 bal -= 1;
             }
             self.pstep -= 1; // TODO find a better way than unwinding the stack
-            if bal == 0 { break; }
+            if bal == 0 {
+                break;
+            }
         }
     }
 }

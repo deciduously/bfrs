@@ -24,8 +24,10 @@ mod tests {
         use parse;
         use Op::*;
 
-        assert_eq!(parse("+-><.[]"), //REMEMBER TO ADD OP::IN
-                   [Inc, Dec, MoveUp, MoveDown, Out, Open, Close]);
+        assert_eq!(
+            parse("+-><.[]"), //REMEMBER TO ADD OP::IN
+            [Inc, Dec, MoveUp, MoveDown, Out, Open, Close]
+        );
     }
     #[test]
     #[should_panic(expected = "Unrecognized char: x")]
@@ -39,14 +41,6 @@ mod tests {
         let mut test_machine = Machine::new(Vec::new());
         test_machine.increment();
         assert_eq!(test_machine.tape[test_machine.index], 1);
-    }
-    #[test]
-    #[should_panic(expected = "Cell overflow at 0, could not increment")]
-    fn test_increment_overflow() {
-        use Machine;
-        let mut test_machine = Machine::new(Vec::new());
-        test_machine.tape[test_machine.index] = 255;
-        test_machine.increment();
     }
     #[test]
     fn test_decrement() {
@@ -122,16 +116,19 @@ mod tests {
     fn test_hello_world() {
         use run;
         assert_eq!(run("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."),
-                   "Hello, World!");
+                   "Hello World!\n");
     }
     #[test]
     fn test_no_loops() {
         use run;
-        assert_eq!(run("++++++++++++++++++++++++++++++++++++++++++++++++."), "0")
+        assert_eq!(
+            run("++++++++++++++++++++++++++++++++++++++++++++++++."),
+            "0"
+        )
     }
     #[test]
     fn test_simple_loop() {
         use run;
-        assert_eq!(run("++++[-]"), "")
+        assert_eq!(run("++>+++++[<+>-]++++++++[<++++++>-]<."), "7")
     }
 }
