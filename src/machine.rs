@@ -1,4 +1,3 @@
-use parser::Program;
 use std::io::{stdin, Read};
 
 #[derive(Debug)]
@@ -17,11 +16,6 @@ impl Machine {
             // debug bool?
         }
     }
-
-   // pub fn execute(mut self, program: Program, debug: bool) -> String {
-   //     program.run(self, debug); // value moved here.
-   //     String::from_utf8(self.output.clone()).expect("could not parse output")
-   // }
 
     pub fn increment(&mut self) {
         if self.tape[self.index] == 255 {
