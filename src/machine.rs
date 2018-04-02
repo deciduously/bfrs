@@ -4,7 +4,6 @@ use std::io::{stdin, Read};
 pub struct Machine {
     pub tape: Vec<u8>,
     pub index: usize,
-    //pub output: Vec<u8>,
 }
 
 impl Machine {
@@ -12,8 +11,6 @@ impl Machine {
         Machine {
             tape: vec![0],
             index: 0,
-            //output: Vec::new(),
-            // debug bool?
         }
     }
 

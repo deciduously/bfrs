@@ -98,7 +98,7 @@ impl Program {
                         // if EOF, unmatched '['?
                     }
                     ret.push(Construct::make_loop(&loop_body));
-                },
+                }
                 Token::Close => panic!("Unmatched ']'"),
                 _ => ret.push(Construct::from_token(&tokens[pstep])),
             }
