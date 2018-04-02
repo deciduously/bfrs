@@ -5,7 +5,7 @@ use std::io::{stdin, Read};
 pub struct Machine {
     pub tape: Vec<u8>,
     pub index: usize,
-    pub output: Vec<u8>,
+    //pub output: Vec<u8>,
 }
 
 impl Machine {
@@ -13,15 +13,15 @@ impl Machine {
         Machine {
             tape: vec![0],
             index: 0,
-            output: Vec::new(),
+            //output: Vec::new(),
             // debug bool?
         }
     }
 
-    pub fn execute(&mut self, program: Program, debug: bool) -> String {
-        program.run(self, debug);
-        String::from_utf8(self.output.clone()).expect("could not parse output")
-    }
+   // pub fn execute(mut self, program: Program, debug: bool) -> String {
+   //     program.run(self, debug); // value moved here.
+   //     String::from_utf8(self.output.clone()).expect("could not parse output")
+   // }
 
     pub fn increment(&mut self) {
         if self.tape[self.index] == 255 {
@@ -54,9 +54,9 @@ impl Machine {
         }
     }
 
-    pub fn output(&mut self) {
+    pub fn output(&self) {
         if self.tape[self.index].is_ascii() {
-            self.output.push(self.tape[self.index] as u8)
+            print!("{}", self.tape[self.index] as char)
         } else {
             panic!("char at {} not ascii", self.index);
         }

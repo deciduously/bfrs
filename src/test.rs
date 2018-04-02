@@ -5,8 +5,6 @@ use lexer::Token::*;
 #[cfg(test)]
 use lexer::*;
 #[cfg(test)]
-use run::*;
-#[cfg(test)]
 use parser::{Command, Construct::{self, Op}, Program};
 
 #[test]
@@ -30,7 +28,7 @@ fn test_lex_comment() {
 #[test]
 fn test_increment() {
     let mut test_machine = Machine::new();
-    test_machine.increment();
+    &test_machine.increment();
     assert_eq!(test_machine.tape[test_machine.index], 1);
 }
 #[test]
@@ -60,30 +58,6 @@ fn test_move_left_panic() {
     test_machine.move_left();
 }
 #[test]
-fn test_output() {
-    let mut test_machine = Machine::new();
-
-    test_machine.tape[test_machine.index] = 65;
-    test_machine.output();
-    assert_eq!(test_machine.output[0], 'A' as u8);
-
-    test_machine.tape[test_machine.index] = 97;
-    test_machine.output();
-    assert_eq!(test_machine.output[1], 'a' as u8);
-
-    test_machine.tape[test_machine.index] = 9;
-    test_machine.output();
-    assert_eq!(test_machine.output[2], '\t' as u8);
-
-    test_machine.tape[test_machine.index] = 0;
-    test_machine.output();
-    assert_eq!(test_machine.output[3], '\0' as u8);
-
-    test_machine.tape[test_machine.index] = 2;
-    test_machine.output();
-    assert_eq!(test_machine.output[4], 2u8);
-}
-#[test]
 #[should_panic(expected = "char at 0 not ascii")]
 fn test_out_not_ascii() {
     let mut test_machine = Machine::new();
@@ -91,35 +65,9 @@ fn test_out_not_ascii() {
     test_machine.output();
 }
 #[test]
-fn test_hello_world() {
-    assert_eq!(run("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.", false),
-                   "Hello World!\n");
-}
-#[test]
-fn test_no_loops() {
-    assert_eq!(
-        run("++++++++++++++++++++++++++++++++++++++++++++++++.", false),
-        "0"
-    );
-}
-#[test]
-fn test_simple_loop() {
-    assert_eq!(run("++>+++++[<+>-]++++++++[<++++++>-]<.", false), "7");
-}
-#[test]
-fn test_one_loop() {
-    assert_eq!(
-        run(
-            "+++++++++++++++++++++++++++++++++++++++++++>++++[-]<.",
-            false
-        ),
-        "+"
-    );
-}
-#[test]
 fn test_make_loop() {
     assert_eq!(
-        Construct::make_loop(lex("<+>-")),
+        Construct::make_loop(&lex("<+>-")),
         Construct::Loop(Program {
             commands: vec![
                 Op(Command::MoveLeft),
@@ -133,7 +81,7 @@ fn test_make_loop() {
 #[test]
 fn test_parse_one_loop() {
     assert_eq!(
-        Program::new(lex("[<+>-]")),
+        Program::new(&lex("[<+>-]")),
         Program {
             commands: vec![
                 Construct::Loop(Program {

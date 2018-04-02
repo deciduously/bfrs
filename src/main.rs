@@ -31,6 +31,5 @@ fn main() {
     };
 
     let prog = get_bf(&file_path).expect("Could not parse string");
-    let result = run(&prog, debug);
-    println!("{}", result);
+    run(&prog, debug);
 }

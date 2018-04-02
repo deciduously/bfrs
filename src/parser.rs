@@ -8,7 +8,7 @@ pub enum Construct {
 }
 
 impl Construct {
-    pub fn make_loop(loop_body: Tokens) -> Construct {
+    pub fn make_loop(loop_body: &Tokens) -> Construct {
         Construct::Loop(Program::new(loop_body))
     }
 
@@ -30,9 +30,9 @@ impl Construct {
         use self::Construct::*;
 
         match self {
-            Op(command) => (&command).run(machine),
+            Op(command) => command.run(machine),
             Loop(commands) => while machine.tape[machine.index] != 0 {
-                commands.clone().run(machine, debug);
+                commands.clone().run(machine, debug); // cloning because we loop over it
             },
         }
     }
@@ -49,9 +49,9 @@ pub enum Command {
 }
 
 impl Command {
-    pub fn run(&self, machine: &mut Machine) {
+    pub fn run(self, machine: &mut Machine) {
         use self::Command::*;
-        match *self {
+        match self {
             Increment => machine.increment(),
             Decrement => machine.decrement(),
             MoveLeft => machine.move_left(),
@@ -68,7 +68,7 @@ pub struct Program {
 }
 
 impl Program {
-    pub fn new(tokens: Tokens) -> Program {
+    pub fn new(tokens: &Tokens) -> Program {
         let mut pstep: usize = 0;
 
         let mut ret: Vec<Construct> = Vec::new();
@@ -81,23 +81,23 @@ impl Program {
 
                     loop {
                         pstep += 1;
-                        let curr = tokens[pstep].clone();
+                        let curr = &tokens[pstep];
 
-                        if curr == Token::Open {
+                        if curr == &Token::Open {
                             bal += 1;
                         }
 
-                        if curr == Token::Close {
+                        if curr == &Token::Close {
                             bal -= 1;
                         }
 
                         if bal == 0 {
                             break;
                         }
-                        loop_body.push(curr);
+                        loop_body.push(curr.clone());
                         // if EOF, unmatched '['?
                     }
-                    ret.push(Construct::make_loop(loop_body));
+                    ret.push(Construct::make_loop(&loop_body));
                 },
                 Token::Close => panic!("Unmatched ']'"),
                 _ => ret.push(Construct::from_token(&tokens[pstep])),
@@ -109,11 +109,11 @@ impl Program {
     }
 
     pub fn run(self, machine: &mut Machine, debug: bool) {
-        for command in &self.commands {
+        for command in self.commands {
             if debug {
                 println!("{:?}", machine);
             }
-            command.clone().run(machine, debug);
+            command.run(machine, debug);
         }
     }
 }
