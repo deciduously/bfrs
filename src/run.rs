@@ -1,9 +1,9 @@
 use machine::Machine;
-use parse::parse;
+use lexer::lex;
+use parser::Program;
 
-pub fn run(input: &str, debug: bool) -> String {
-    let program = parse(input);
-    let mut machine = Machine::new(program);
-    machine.execute(debug);
-    String::from_utf8(machine.output).unwrap()
+pub fn run(source: &str, debug: bool) -> String {
+    let mut machine = Machine::new();
+    let program = Program::new(lex(source));
+    machine.execute(program, debug)
 }

@@ -1,9 +1,12 @@
-extern crate bfrs;
-
-use bfrs::run::run;
+use run::run;
 use std::{env, fs::File, io::{self, BufReader, Read}, path::Path, process::exit};
 
-//TODO BfString type
+mod lexer;
+mod machine;
+mod parser;
+mod run;
+mod test;
+
 fn get_bf(file_path: &str) -> io::Result<String> {
     let file = File::open(Path::new(file_path))?;
 

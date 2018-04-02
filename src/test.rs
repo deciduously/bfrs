@@ -1,100 +1,94 @@
 #[cfg(test)]
 use machine::Machine;
 #[cfg(test)]
-use parse::Op::*;
+use lexer::Token::*;
 #[cfg(test)]
-use parse::*;
+use lexer::*;
 #[cfg(test)]
 use run::*;
+#[cfg(test)]
+use parser::{Command, Construct::{self, Op}, Program};
 
 #[test]
-fn test_translate() {
-    assert_eq!(translate('+'), Some(Inc));
-    assert_eq!(translate('-'), Some(Dec));
-    assert_eq!(translate('<'), Some(MoveDown));
-    assert_eq!(translate('>'), Some(MoveUp));
-    assert_eq!(translate('.'), Some(Out));
-    assert_eq!(translate(','), Some(In));
-    assert_eq!(translate('['), Some(Open));
-    assert_eq!(translate(']'), Some(Close));
-    assert_eq!(translate('x'), None);
-}
-#[test]
-fn test_parse() {
+fn test_lex() {
     assert_eq!(
-        parse("+-><.,[]"),
-        [Inc, Dec, MoveUp, MoveDown, Out, In, Open, Close]
+        lex("+-><.,[]"),
+        [
+            Increment, Decrement, MoveRight, MoveLeft, Output, Input, Open, Close
+        ]
     );
 }
 #[test]
-fn test_parse_illegal() {
+fn test_lex_comment() {
     assert_eq!(
-        parse("+-><.,[]x"),
-        [Inc, Dec, MoveUp, MoveDown, Out, In, Open, Close]
+        lex("+-><.,[]x"),
+        [
+            Increment, Decrement, MoveRight, MoveLeft, Output, Input, Open, Close
+        ]
     );
 }
 #[test]
 fn test_increment() {
-    let mut test_machine = Machine::new(Vec::new());
+    let mut test_machine = Machine::new();
     test_machine.increment();
     assert_eq!(test_machine.tape[test_machine.index], 1);
 }
 #[test]
 fn test_decrement() {
-    let mut test_machine = Machine::new(Vec::new());
+    let mut test_machine = Machine::new();
     test_machine.tape[test_machine.index] = 1;
     test_machine.decrement();
     assert_eq!(test_machine.tape[test_machine.index], 0);
 }
 #[test]
-fn test_move_up() {
-    let mut test_machine = Machine::new(Vec::new());
-    test_machine.move_up();
+fn test_move_right() {
+    let mut test_machine = Machine::new();
+    test_machine.move_right();
     assert_eq!(test_machine.index, 1);
 }
 #[test]
-fn test_move_down() {
-    let mut test_machine = Machine::new(Vec::new());
+fn test_move_left() {
+    let mut test_machine = Machine::new();
     test_machine.index = 2;
-    test_machine.move_down();
+    test_machine.move_left();
     assert_eq!(test_machine.index, 1);
 }
 #[test]
 #[should_panic(expected = "no more room on left of tape")]
-fn test_move_down_panic() {
-    let mut test_machine = Machine::new(Vec::new());
-    test_machine.move_down();
+fn test_move_left_panic() {
+    let mut test_machine = Machine::new();
+    test_machine.move_left();
 }
 #[test]
-fn test_out() {
-    let mut test_machine = Machine::new(Vec::new());
+fn test_output() {
+    let mut test_machine = Machine::new();
 
     test_machine.tape[test_machine.index] = 65;
-    test_machine.out();
+    test_machine.output();
     assert_eq!(test_machine.output[0], 'A' as u8);
 
     test_machine.tape[test_machine.index] = 97;
-    test_machine.out();
+    test_machine.output();
     assert_eq!(test_machine.output[1], 'a' as u8);
 
     test_machine.tape[test_machine.index] = 9;
-    test_machine.out();
+    test_machine.output();
     assert_eq!(test_machine.output[2], '\t' as u8);
 
     test_machine.tape[test_machine.index] = 0;
-    test_machine.out();
+    test_machine.output();
     assert_eq!(test_machine.output[3], '\0' as u8);
 
     test_machine.tape[test_machine.index] = 2;
-    test_machine.out();
+    test_machine.output();
     assert_eq!(test_machine.output[4], 2u8);
 }
 #[test]
 #[should_panic(expected = "char at 0 not ascii")]
 fn test_out_not_ascii() {
-    let mut test_machine = Machine::new(Vec::new());
+    let mut test_machine = Machine::new();
     test_machine.tape[test_machine.index] = 128;
-    test_machine.out();
+    test_machine.output();
 }
 #[test]
 fn test_hello_world() {
@@ -106,9 +100,51 @@ fn test_no_loops() {
     assert_eq!(
         run("++++++++++++++++++++++++++++++++++++++++++++++++.", false),
         "0"
-    )
+    );
 }
 #[test]
 fn test_simple_loop() {
-    assert_eq!(run("++>+++++[<+>-]++++++++[<++++++>-]<.", false), "7")
+    assert_eq!(run("++>+++++[<+>-]++++++++[<++++++>-]<.", false), "7");
+}
+#[test]
+fn test_one_loop() {
+    assert_eq!(
+        run(
+            "+++++++++++++++++++++++++++++++++++++++++++>++++[-]<.",
+            false
+        ),
+        "+"
+    );
+}
+#[test]
+fn test_make_loop() {
+    assert_eq!(
+        Construct::make_loop(lex("<+>-")),
+        Construct::Loop(Program {
+            commands: vec![
+                Op(Command::MoveLeft),
+                Op(Command::Increment),
+                Op(Command::MoveRight),
+                Op(Command::Decrement),
+            ],
+        })
+    );
+}
+#[test]
+fn test_parse_one_loop() {
+    assert_eq!(
+        Program::new(lex("[<+>-]")),
+        Program {
+            commands: vec![
+                Construct::Loop(Program {
+                    commands: vec![
+                        Op(Command::MoveLeft),
+                        Op(Command::Increment),
+                        Op(Command::MoveRight),
+                        Op(Command::Decrement),
+                    ],
+                }),
+            ],
+        }
+    )
 }
