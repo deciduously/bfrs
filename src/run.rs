@@ -2,8 +2,22 @@ use machine::Machine;
 use lexer::lex;
 use parser::Program;
 
-pub fn run(source: &str, debug: bool) {
-    let mut machine = Machine::new();
-    let program = Program::new(&lex(source));
-    program.run(&mut machine, debug);
+pub struct BfProgram {
+    machine: Machine,
+    program: Program,
+    debug: bool,
+}
+
+impl BfProgram {
+    pub fn new(source: &str, debug: bool) -> BfProgram {
+        BfProgram {
+            machine: Machine::new(),
+            program: Program::new(lex(source)),
+            debug,
+        }
+    }
+
+    pub fn run(mut self) {
+        self.program.run(&mut self.machine, self.debug);
+    }
 }

@@ -1,4 +1,4 @@
-use run::run;
+use run::BfProgram;
 use std::{env, fs::File, io::{self, BufReader, Read}, path::Path, process::exit};
 
 mod lexer;
@@ -30,6 +30,6 @@ fn main() {
         false
     };
 
-    let prog = get_bf(&file_path).expect("Could not parse string");
-    run(&prog, debug);
+    let bf = BfProgram::new(&get_bf(&file_path).expect("Could not parse string"), debug);
+    bf.run();
 }

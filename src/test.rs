@@ -67,7 +67,7 @@ fn test_out_not_ascii() {
 #[test]
 fn test_make_loop() {
     assert_eq!(
-        Construct::make_loop(&lex("<+>-")),
+        Construct::make_loop(lex("<+>-")),
         Construct::Loop(Program {
             commands: vec![
                 Op(Command::MoveLeft),
@@ -81,7 +81,7 @@ fn test_make_loop() {
 #[test]
 fn test_parse_one_loop() {
     assert_eq!(
-        Program::new(&lex("[<+>-]")),
+        Program::new(lex("[<+>-]")),
         Program {
             commands: vec![
                 Construct::Loop(Program {

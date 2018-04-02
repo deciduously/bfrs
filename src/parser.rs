@@ -8,14 +8,16 @@ pub enum Construct {
 }
 
 impl Construct {
-    pub fn make_loop(loop_body: &Tokens) -> Construct {
+    // TODO Result
+    pub fn make_loop(loop_body: Tokens) -> Construct {
         Construct::Loop(Program::new(loop_body))
     }
 
-    pub fn from_token(token: &Token) -> Construct {
+    // TODO Result
+    pub fn from_token(token: Token) -> Construct {
         use self::{Command::*, Construct::Op};
 
-        match *token {
+        match token {
             Token::Increment => Op(Increment),
             Token::Decrement => Op(Decrement),
             Token::MoveRight => Op(MoveRight),
@@ -32,7 +34,7 @@ impl Construct {
         match self {
             Op(command) => command.run(machine),
             Loop(commands) => while machine.tape[machine.index] != 0 {
-                commands.clone().run(machine, debug); // cloning because we loop over it
+                commands.clone().run(machine, debug);
             },
         }
     }
@@ -68,7 +70,8 @@ pub struct Program {
 }
 
 impl Program {
-    pub fn new(tokens: &Tokens) -> Program {
+    // TODO return a Result
+    pub fn new(tokens: Tokens) -> Program {
         let mut pstep: usize = 0;
 
         let mut ret: Vec<Construct> = Vec::new();
@@ -81,26 +84,25 @@ impl Program {
 
                     loop {
                         pstep += 1;
-                        let curr = &tokens[pstep];
 
-                        if curr == &Token::Open {
+                        if tokens[pstep] == Token::Open {
                             bal += 1;
                         }
 
-                        if curr == &Token::Close {
+                        if tokens[pstep] == Token::Close {
                             bal -= 1;
                         }
 
                         if bal == 0 {
                             break;
                         }
-                        loop_body.push(curr.clone());
+                        loop_body.push(tokens[pstep].clone());
                         // if EOF, unmatched '['?
                     }
-                    ret.push(Construct::make_loop(&loop_body));
+                    ret.push(Construct::make_loop(loop_body));
                 }
                 Token::Close => panic!("Unmatched ']'"),
-                _ => ret.push(Construct::from_token(&tokens[pstep])),
+                _ => ret.push(Construct::from_token(tokens[pstep].clone())),
             }
             pstep += 1;
         }
