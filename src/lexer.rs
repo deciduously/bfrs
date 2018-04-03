@@ -1,4 +1,5 @@
 pub type Tokens = Vec<Token>;
+//Box<[Token]>?
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Token {

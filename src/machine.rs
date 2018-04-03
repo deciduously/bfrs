@@ -2,55 +2,41 @@ use std::io::{stdin, Read};
 
 #[derive(Debug)]
 pub struct Machine {
-    pub tape: Vec<u8>,
+    pub tape: Vec<i32>,
     pub index: usize,
+    pub debug: bool,
 }
 
 impl Machine {
-    pub fn new() -> Machine {
+    pub fn new(debug: bool) -> Machine {
         Machine {
             tape: vec![0],
             index: 0,
+            debug,
         }
     }
 
-    pub fn increment(&mut self) {
-        if self.tape[self.index] == 255 {
-            self.tape[self.index] = 0;
-        } else {
-            self.tape[self.index] += 1;
-        }
+    pub fn curr(&self) -> i32 {
+        self.tape[self.index]
     }
 
-    pub fn decrement(&mut self) {
-        if self.tape[self.index] == 0 {
-            self.tape[self.index] = 255;
-        } else {
-            self.tape[self.index] -= 1;
-        }
+    pub fn curr_char(&self) -> char {
+        self.curr() as u8 as char
     }
 
-    pub fn move_right(&mut self) {
-        if self.index == self.tape.len() - 1 {
+    pub fn increment(&mut self, offset: i32) {
+        self.tape[self.index] += offset;
+    }
+
+    pub fn shift(&mut self, offset: isize) {
+        self.index = (self.index as isize + offset) as usize;
+        if self.index >= self.tape.len() {
             self.tape.push(0);
-        }
-        self.index += 1;
-    }
-
-    pub fn move_left(&mut self) {
-        if self.index > 0 {
-            self.index -= 1;
-        } else {
-            panic!("no more room on left of tape");
         }
     }
 
     pub fn output(&self) {
-        if self.tape[self.index].is_ascii() {
-            print!("{}", self.tape[self.index] as char)
-        } else {
-            panic!("char at {} not ascii", self.index);
-        }
+        print!("{}", self.curr_char()); // io::flush?
     }
 
     pub fn input(&mut self) {
@@ -58,6 +44,6 @@ impl Machine {
         stdin()
             .read_exact(&mut in_char)
             .expect("Could not read byte");
-        self.tape[self.index] = in_char[0];
+        self.tape[self.index] = in_char[0] as i32;
     }
 }
