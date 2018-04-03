@@ -11,7 +11,7 @@ Use [cargo](https://doc.rust-lang.org/stable/cargo) run, test, install, --releas
 ## Performance
 Middling.
 
-On my machine (AMD A10-5750M) it runs `benchmark.b` in 7.02 seconds and [`mandel.b`](https://github.com/kostya/benchmarks/blob/master/brainfuck2/mandel.b) in 102.20 seconds.
+On my machine (AMD A10-5750M) it runs `benchmark.b` in 6.66 seconds and [`mandel.b`](https://github.com/kostya/benchmarks/blob/master/brainfuck2/mandel.b) in 95.02 seconds.
 
 First stab at it was even worse, 13.21 and 221.16 respectively, so, you know, gainz.
 ## Acknowledgements
