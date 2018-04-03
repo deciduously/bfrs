@@ -1,4 +1,4 @@
-use std::io::{stdin, Read};
+use std::io::{self, Read};
 
 #[derive(Debug)]
 pub struct Machine {
@@ -36,12 +36,13 @@ impl Machine {
     }
 
     pub fn output(&self) {
-        print!("{}", self.curr_char()); // io::flush?
+        print!("{}", self.curr_char());
+        io::Write::flush(&mut io::stdout()).unwrap();
     }
 
     pub fn input(&mut self) {
         let mut in_char: [u8; 1] = [0];
-        stdin()
+        io::stdin()
             .read_exact(&mut in_char)
             .expect("Could not read byte");
         self.tape[self.index] = in_char[0] as i32;
