@@ -24,7 +24,6 @@ impl Op {
             _ => panic!("Reached a loop char where there should not be one"),
         }
     }
-
 }
 
 #[derive(Debug, PartialEq)]
@@ -70,6 +69,8 @@ impl Program {
             pstep += 1;
         }
 
-        Program { commands: ret.into_boxed_slice() }
+        Program {
+            commands: ret.into_boxed_slice(),
+        }
     }
 }

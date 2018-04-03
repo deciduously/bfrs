@@ -52,6 +52,6 @@ impl Machine {
         io::stdin()
             .read_exact(&mut in_char)
             .expect("Could not read byte");
-        self.tape[self.index] = in_char[0] as i32;
+        self.tape[self.index] = i32::from(in_char[0]);
     }
 }

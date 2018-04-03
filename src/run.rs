@@ -34,8 +34,8 @@ fn _run(program: &[Op], machine: &mut Machine) {
             Print => machine.output(),
             Input => machine.input(),
             Loop(ref ops) => while machine.curr() > 0 {
-               _run(ops, machine);
-            }
+                _run(ops, machine);
+            },
         }
     }
 }

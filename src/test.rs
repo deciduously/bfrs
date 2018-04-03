@@ -6,7 +6,6 @@ use lexer::Token::*;
 use lexer::*;
 #[cfg(test)]
 //use parser::{Command, Construct::{self, Op}, Program};
-
 #[test]
 fn test_lex() {
     assert_eq!(
