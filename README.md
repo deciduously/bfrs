@@ -9,9 +9,11 @@ Rust 1.25.0 or higher (I jumped on those nested import groups).  Or download the
 ## Development
 Use [cargo](https://doc.rust-lang.org/stable/cargo) run, test, install, --release, etc.
 ## Performance
-Dismal.
+Middling.
 
-On my machine (AMD A10-5750M) it runs `benchmark.b` in 13.21 seconds and [`mandlebrot.b`](https://github.com/kostya/benchmarks/blob/master/brainfuck2/mandel.b) in 221.16 seconds.
+On my machine (AMD A10-5750M) it runs `benchmark.b` in 7.02 seconds and [`mandel.b`](https://github.com/kostya/benchmarks/blob/master/brainfuck2/mandel.b) in 102.20 seconds.
+
+First stab at it was even worse, 13.21 and 221.16 respectively, so, you know, gainz.
 ## Acknowledgements
 This [crazy page](http://www.hevanet.com/cristofd/brainfuck/) from this [crazy guy](http://www.hevanet.com/cristofd/brainfuck/daniel.png).  Thanks, Cristof.  He wrote the sierpinksi one and some of the other tests I've been using.
 

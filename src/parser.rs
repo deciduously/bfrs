@@ -1,11 +1,10 @@
 use lexer::{Token, Tokens};
-use machine::Machine;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum Op {
     Increment(i32),
     Shift(isize),
-    Loop(Program),
+    Loop(Box<[Op]>),
     Print,
     Input,
 }
@@ -26,21 +25,9 @@ impl Op {
         }
     }
 
-    pub fn run(self, machine: &mut Machine) {
-        use self::Op::*;
-        match self {
-            Increment(x) => machine.increment(x),
-            Shift(x) => machine.shift(x),
-            Print => machine.output(),
-            Input => machine.input(),
-            Loop(ref ops) => while machine.curr() > 0 {
-                ops.clone().run(machine); // TODO don't clone
-            }
-        };
-    }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Program {
     pub commands: Box<[Op]>,
 }
@@ -75,7 +62,7 @@ impl Program {
                         loop_body.push(tokens[pstep].clone());
                         // if EOF, unmatched '['?
                     }
-                    ret.push(Op::Loop(Program::new(loop_body)));
+                    ret.push(Op::Loop(Program::new(loop_body).commands));
                 }
                 Token::Close => panic!("Unmatched ']'"),
                 _ => ret.push(Op::from_token(&tokens[pstep])),
@@ -84,14 +71,5 @@ impl Program {
         }
 
         Program { commands: ret.into_boxed_slice() }
-    }
-
-    pub fn run(self, machine: &mut Machine) {
-        for command in self.commands.iter() {
-            if machine.debug {
-                println!("{:?}", machine);
-            }
-            command.clone().run(machine); // TODO don't clone
-        }
     }
 }

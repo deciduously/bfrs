@@ -1,6 +1,6 @@
 use machine::Machine;
 use lexer::lex;
-use parser::Program;
+use parser::{Op, Program};
 
 pub struct BfProgram {
     machine: Machine,
@@ -16,6 +16,26 @@ impl BfProgram {
     }
 
     pub fn run(mut self) {
-        self.program.run(&mut self.machine);
+        _run(&self.program.commands, &mut self.machine);
+    }
+}
+
+fn _run(program: &[Op], machine: &mut Machine) {
+    use self::Op::*;
+
+    for op in program {
+        if machine.debug {
+            println!("{:?}", machine);
+        }
+
+        match *op {
+            Increment(x) => machine.increment(x),
+            Shift(x) => machine.shift(x),
+            Print => machine.output(),
+            Input => machine.input(),
+            Loop(ref ops) => while machine.curr() > 0 {
+               _run(ops, machine);
+            }
+        }
     }
 }

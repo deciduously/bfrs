@@ -29,6 +29,9 @@ impl Machine {
     }
 
     pub fn shift(&mut self, offset: isize) {
+        if self.index as isize + offset < 0 {
+            panic!("no more room on left of tape!")
+        }
         self.index = (self.index as isize + offset) as usize;
         if self.index >= self.tape.len() {
             self.tape.push(0);
@@ -36,8 +39,12 @@ impl Machine {
     }
 
     pub fn output(&self) {
-        print!("{}", self.curr_char());
-        io::Write::flush(&mut io::stdout()).unwrap();
+        if self.curr_char().is_ascii() {
+            print!("{}", self.curr_char());
+            io::Write::flush(&mut io::stdout()).unwrap();
+        } else {
+            panic!("char at {} not ascii", self.index);
+        }
     }
 
     pub fn input(&mut self) {
