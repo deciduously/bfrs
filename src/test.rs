@@ -9,8 +9,8 @@ use lexer::*;
 #[test]
 fn test_lex() {
     assert_eq!(
-        lex("+-><.,[]"),
-        [
+        &lex("+-><.,[]"),
+        &[
             Increment, Decrement, MoveRight, MoveLeft, Output, Input, Open, Close
         ]
     );
@@ -18,8 +18,8 @@ fn test_lex() {
 #[test]
 fn test_lex_comment() {
     assert_eq!(
-        lex("+-><.,[]x"),
-        [
+        &lex("+-><.,[]x"),
+        &[
             Increment, Decrement, MoveRight, MoveLeft, Output, Input, Open, Close
         ]
     );

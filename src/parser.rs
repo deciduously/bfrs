@@ -58,10 +58,10 @@ impl Program {
                         if bal == 0 {
                             break;
                         }
-                        loop_body.push(tokens[pstep].clone());
+                        loop_body.push(tokens[pstep]);
                         // if EOF, unmatched '['?
                     }
-                    ret.push(Op::Loop(Program::new(loop_body).commands));
+                    ret.push(Op::Loop(Program::new(loop_body.into_boxed_slice()).commands));
                 }
                 Token::Close => panic!("Unmatched ']'"),
                 _ => ret.push(Op::from_token(&tokens[pstep])),

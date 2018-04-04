@@ -1,7 +1,6 @@
-pub type Tokens = Vec<Token>;
-//Box<[Token]>?
+pub type Tokens = Box<[Token]>;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
 pub enum Token {
     Increment,
     Decrement,
@@ -33,5 +32,5 @@ pub fn lex(input: &str) -> Tokens {
             ret.push(op);
         }
     }
-    ret
+    ret.into_boxed_slice()
 }
