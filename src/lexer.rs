@@ -22,15 +22,8 @@ pub enum Token {
     Input,
     Open,
     Close,
+    Debug,
 }
-
-//impl Deref for Token {
-//    type Target = Token;
-//
-//    fn deref(&self) -> &Self::Target {
-//        self
-//    }
-//}
 
 impl FromStr for Token {
     type Err = io::Error;
@@ -47,6 +40,7 @@ impl FromStr for Token {
             "," => Some(Input),
             "[" => Some(Open),
             "]" => Some(Close),
+            "#" => Some(Debug),
             _ => None,
         };
 

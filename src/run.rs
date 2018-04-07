@@ -33,6 +33,7 @@ fn _run(program: &[Op], machine: &mut Machine) {
             Shift(x) => machine.shift(x),
             Print => machine.output(),
             Input => machine.input(),
+            Dump => println!("{:?}", machine),
             Loop(ref ops) => while machine.curr() > 0 {
                 _run(ops, machine);
             },

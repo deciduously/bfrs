@@ -7,6 +7,7 @@ pub enum Op {
     Loop(Box<[Op]>),
     Print,
     Input,
+    Dump,
 }
 
 impl Op {
@@ -21,6 +22,7 @@ impl Op {
             Token::MoveLeft => Shift(-1),
             Token::Output => Print,
             Token::Input => Input,
+            Token::Debug => Dump,
             _ => panic!("Reached a loop char where there should not be one"),
         }
     }
@@ -41,7 +43,7 @@ impl Program {
         while pstep < source.len() {
             match source[pstep] {
                 Token::Open => {
-                    // Op::Loop(Program::new())
+                    // TODO This is most likely the slowest part of the whole shindig
                     let mut loop_body = Vec::new();
                     let mut bal = 1;
 
