@@ -1,4 +1,16 @@
-pub type Tokens = Box<[Token]>;
+use std::{io, str::FromStr};
+pub type Tokens = Vec<Token>;
+
+pub fn lex(s: &str) -> Tokens {
+    let mut ret = Vec::new();
+    for c in s.split("") {
+        if let Ok(token) = Token::from_str(c) {
+            ret.push(token);
+        }
+    }
+
+    ret
+}
 
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
 pub enum Token {
@@ -12,25 +24,35 @@ pub enum Token {
     Close,
 }
 
-pub fn lex(input: &str) -> Tokens {
-    let mut ret = Vec::new();
+//impl Deref for Token {
+//    type Target = Token;
+//
+//    fn deref(&self) -> &Self::Target {
+//        self
+//    }
+//}
 
-    for c in input.chars() {
+impl FromStr for Token {
+    type Err = io::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         use self::Token::*;
 
-        if let Some(op) = match c {
-            '+' => Some(Increment),
-            '-' => Some(Decrement),
-            '>' => Some(MoveRight),
-            '<' => Some(MoveLeft),
-            '.' => Some(Output),
-            ',' => Some(Input),
-            '[' => Some(Open),
-            ']' => Some(Close),
+        let token = match s {
+            "+" => Some(Increment),
+            "-" => Some(Decrement),
+            ">" => Some(MoveRight),
+            "<" => Some(MoveLeft),
+            "." => Some(Output),
+            "," => Some(Input),
+            "[" => Some(Open),
+            "]" => Some(Close),
             _ => None,
-        } {
-            ret.push(op);
+        };
+
+        match token {
+            Some(token) => Ok(token),
+            None => Err(io::Error::new(io::ErrorKind::Other, "unrecognized token")),
         }
     }
-    ret.into_boxed_slice()
 }

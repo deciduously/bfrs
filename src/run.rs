@@ -1,5 +1,5 @@
-use machine::Machine;
 use lexer::lex;
+use machine::Machine;
 use parser::{Op, Program};
 
 pub struct BfProgram {
@@ -11,7 +11,7 @@ impl BfProgram {
     pub fn new(source: &str, debug: bool) -> BfProgram {
         BfProgram {
             machine: Machine::new(debug),
-            program: Program::new(lex(source)),
+            program: Program::new(&lex(source)),
         }
     }
 

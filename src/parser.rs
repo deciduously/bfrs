@@ -11,10 +11,10 @@ pub enum Op {
 
 impl Op {
     // TODO Result
-    pub fn from_token(token: &Token) -> Op {
+    pub fn from_token(token: Token) -> Op {
         use self::Op::*;
 
-        match *token {
+        match token {
             Token::Increment => Increment(1),
             Token::Decrement => Increment(-1),
             Token::MoveRight => Shift(1),
@@ -33,38 +33,39 @@ pub struct Program {
 
 impl Program {
     // TODO return a Result
-    pub fn new(tokens: Tokens) -> Program {
+    pub fn new(source: &Tokens) -> Program {
         let mut pstep: usize = 0;
 
         let mut ret = Vec::new();
 
-        while pstep < tokens.len() {
-            match tokens[pstep] {
+        while pstep < source.len() {
+            match source[pstep] {
                 Token::Open => {
+                    // Op::Loop(Program::new())
                     let mut loop_body = Vec::new();
                     let mut bal = 1;
 
                     loop {
                         pstep += 1;
 
-                        if tokens[pstep] == Token::Open {
+                        if source[pstep] == Token::Open {
                             bal += 1;
                         }
 
-                        if tokens[pstep] == Token::Close {
+                        if source[pstep] == Token::Close {
                             bal -= 1;
                         }
 
                         if bal == 0 {
                             break;
                         }
-                        loop_body.push(tokens[pstep]);
+                        loop_body.push(source[pstep]);
                         // if EOF, unmatched '['?
                     }
-                    ret.push(Op::Loop(Program::new(loop_body.into_boxed_slice()).commands));
+                    ret.push(Op::Loop(Program::new(&loop_body).commands));
                 }
                 Token::Close => panic!("Unmatched ']'"),
-                _ => ret.push(Op::from_token(&tokens[pstep])),
+                _ => ret.push(Op::from_token(source[pstep])),
             }
             pstep += 1;
         }
